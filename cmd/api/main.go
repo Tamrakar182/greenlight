@@ -4,11 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"fmt"
 	"greenlight/internal/data"
 	"greenlight/internal/jsonlog"
-	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -71,21 +68,11 @@ func main() {
 		models: data.NewModels(db),
 	}
 
-	srv := &http.Server{
-		Addr:        fmt.Sprintf(":%d", cfg.port),
-		Handler:     app.routes(),
-		ErrorLog:    log.New(logger, "", 0),
-		IdleTimeout: time.Minute,
-		ReadTimeout: 10 * time.Second, WriteTimeout: 30 * time.Second,
+	err = app.serve()
+
+	if err != nil {
+		logger.PrintFatal(err, nil)
 	}
-
-	logger.PrintInfo("Starting server", map[string]string{
-		"env":  cfg.env,
-		"addr": srv.Addr,
-	})
-
-	err = srv.ListenAndServe()
-	logger.PrintFatal(err, nil)
 }
 
 func openDB(cfg config) (*sql.DB, error) {
