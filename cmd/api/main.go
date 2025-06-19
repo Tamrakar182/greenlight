@@ -8,6 +8,7 @@ import (
 	"greenlight/internal/jsonlog"
 	"greenlight/internal/mailer"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,6 +38,9 @@ type config struct {
 		password string
 		sender   string
 	}
+	cors struct {
+		trustedOrigins []string
+	}
 }
 
 type application struct {
@@ -44,7 +48,7 @@ type application struct {
 	logger *jsonlog.Logger
 	models data.Models
 	mailer mailer.Mailer
-	wg sync.WaitGroup
+	wg     sync.WaitGroup
 }
 
 func main() {
@@ -67,6 +71,11 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtp-username", "4a778773fa3b73", "SMTP username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", "e3073d41e67797", "SMTP password")
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@test.com>", "SMTP sender")
+
+	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
+		cfg.cors.trustedOrigins = strings.Fields(val)
+		return nil
+	})
 
 	flag.Parse()
 
