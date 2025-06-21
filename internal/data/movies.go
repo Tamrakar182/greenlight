@@ -156,7 +156,7 @@ func (m MoviewModel) GetAll(title string, genres []string, filters Filters) ([]*
 	if err = rows.Err(); err != nil {
 		return nil, Metadata{}, err
 	}
-	
+
 	metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
 
 	return movies, metadata, nil
